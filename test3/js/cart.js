@@ -5,20 +5,15 @@ const addLink = 'https://neto-api.herokuapp.com/cart';
 const removeLink = 'https://neto-api.herokuapp.com/cart/remove';
 const sizeSwatch = document.querySelector('#sizeSwatch');
 const colorSwatch = document.querySelector('#colorSwatch');
-const quickCart =document.querySelector('#quick-cart');
+const quickCart = document.querySelector('#quick-cart');
 const addToCart = document.querySelector('#AddToCart');
-const xhr = new XMLHttpRequest();
 const form = document.querySelector('#AddToCartForm');
-
-
 let img = document.createElement('img');
 
-console.log(addToCart);
 
 img.src = 'https://neto-api.herokuapp.com/hj/3.3/cart/soldout.png?10994296540668815886';
 img.classList.add('crossed-out');
 addToCart.addEventListener('click', send);
-xhr.addEventListener("load", onLoad);
 
 
 Promise.all(apis.map(item => fetch(item))).then(responses =>
@@ -29,34 +24,33 @@ Promise.all(apis.map(item => fetch(item))).then(responses =>
             handleCart(responds[2]);
         }));
 
-function send(e){
+function send(e) {
     e.preventDefault();
-    let formToSend =  new FormData();
-    formToSend.append('productId', form.dataset.productId);
-    formToSend.append('color', localStorage.getItem('color'));
-    formToSend.append('size', localStorage.getItem('size'));
-    formToSend.append('quantity', 1);
-
-
-
-    console.log(formToSend);
-    xhr.open('POST', addLink);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(formToSend));
+    let formD = new FormData(form);
+    formD.append('productId', form.dataset.productId);
+    let fetchData = {
+        method: 'POST',
+        body: formD,
+    };
+    fetch(addLink, fetchData)
+        .then((response) =>{
+            return response.json();
+        })
+        .then(parseServerAnswer);
 }
 
-function onLoad(){
-    console.log(xhr.responseText);
+function parseServerAnswer(data){
+    handleCart(data);
 }
 
-function handleColors(colors){
+function handleColors(colors) {
     let color = localStorage.getItem('color');
     colors.forEach((item, indx) => {
         let colorBg = document.createElement('span');
         colorBg.style.backgroundColor = item.type;
         let label = document.createElement('label');
         label.style.borderColor = item.type;
-        label.htmlFor = 'swatch-'+ indx + '-'+item.type;
+        label.htmlFor = 'swatch-' + indx + '-' + item.type;
         label.appendChild(colorBg);
         let crossImg = img.cloneNode();
         label.appendChild(crossImg);
@@ -68,13 +62,13 @@ function handleColors(colors){
         let inputRadio = document.createElement('input');
         inputRadio.type = 'radio';
         inputRadio.name = 'color';
-        inputRadio.id = 'swatch-'+ indx + '-'+item.type;
+        inputRadio.id = 'swatch-' + indx + '-' + item.type;
         inputRadio.quickbeam = 'color';
         inputRadio.value = item.type;
-        if(color == item.type){
+        if (color == item.type) {
             inputRadio.setAttribute('checked', true)
         }
-        if(!item.isAvailable) {
+        if (!item.isAvailable) {
             inputRadio.setAttribute('disabled', true);
         }
 
@@ -83,7 +77,7 @@ function handleColors(colors){
         divWrap.classList.add('swatch-element');
         divWrap.classList.add('color');
         divWrap.classList.add(item.type);
-        if(item.isAvailable){
+        if (item.isAvailable) {
             divWrap.classList.add('available');
         }
         else {
@@ -99,12 +93,13 @@ function handleColors(colors){
 
 
 }
-function handleSizes(sizes){
+
+function handleSizes(sizes) {
     let size = localStorage.getItem('size');
     sizes.forEach((item, indx) => {
         let crossImg = img.cloneNode();
         let label = document.createElement('label');
-        label.htmlFor = 'swatch-' + indx +'-'+item.type;
+        label.htmlFor = 'swatch-' + indx + '-' + item.type;
         label.textContent = item.title;
         label.appendChild(crossImg);
 
@@ -113,20 +108,20 @@ function handleSizes(sizes){
         inputRadio.type = 'radio';
         inputRadio.name = 'size';
         inputRadio.value = item.type;
-        if(size == item.type){
+        if (size == item.type) {
             inputRadio.setAttribute('checked', true)
         }
-        if(!item.isAvailable) {
+        if (!item.isAvailable) {
             inputRadio.setAttribute('disabled', true);
         }
-        inputRadio.id = 'swatch-' + indx+'-'+item.type;
+        inputRadio.id = 'swatch-' + indx + '-' + item.type;
 
         let divWrap = document.createElement('div');
         divWrap.dataset['value'] = item.type;
         divWrap.classList.add('swatch-element');
         divWrap.classList.add('plain');
         divWrap.classList.add(item.type);
-        if(item.isAvailable){
+        if (item.isAvailable) {
             divWrap.classList.add('available');
         }
         else {
@@ -140,8 +135,10 @@ function handleSizes(sizes){
     });
 
 }
-function handleCart(cart){
-console.log(cart)
+
+function handleCart(cart) {
+    let elems = quickCart.children;
+    Array.from(elems).forEach(item => quickCart.removeChild(item));
     var totalPrice = 0;
     cart.forEach((item, indx)=> {
         let img = document.createElement('img');
@@ -180,7 +177,7 @@ console.log(cart)
         let divWrap = document.createElement('div');
         divWrap.classList.add('quick-cart-product');
         divWrap.classList.add('quick-cart-product-static');
-        divWrap.id = 'quick-cart-product-'+item.id;
+        divWrap.id = 'quick-cart-product-' + item.id;
         divWrap.style.opacity = 1;
 
         divWrap.appendChild(divImgWpar);
@@ -189,8 +186,6 @@ console.log(cart)
 
         quickCart.appendChild(divWrap);
         spanRemove.addEventListener('click', removeItem);
-
-
     });
     let strong = document.createElement('strong');
     strong.classList.add('quick-cart-text');
@@ -211,7 +206,7 @@ console.log(cart)
     cartA.id = 'quick-cart-pay';
     cartA.setAttribute('quickbeam', 'cart-pay');
     cartA.classList.add('cart-ico');
-    if(cart.length > 0){
+    if (cart.length > 0) {
         cartA.classList.add('open');
     }
     cartA.appendChild(spanWrap);
@@ -219,15 +214,25 @@ console.log(cart)
 
 }
 
-function removeItem(e){
+function removeItem(e) {
     console.log('hello')
-    let itemToRemove = e.target.parentNode
-    quickCart.removeChild(itemToRemove);
+    let formD = new FormData(form);
+    formD.append('productId', form.dataset.productId);
+    formD.set('quantity', 0);
+    let fetchData = {
+        method: 'POST',
+        body: formD,
+    };
+    fetch(removeLink, fetchData)
+        .then((response) =>{
+            return response.json();
+        })
+        .then(parseServerAnswer);
 }
 
-function storeChoise(e){
-    if(e.target.value){
-        let size =e.target.value;
+function storeChoise(e) {
+    if (e.target.value) {
+        let size = e.target.value;
         let name = e.target.name;
         localStorage.setItem(name, size);
     }

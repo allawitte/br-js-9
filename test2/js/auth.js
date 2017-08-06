@@ -19,12 +19,12 @@ function onLoad() {
     else {
         let lastWord;
         if(currentForm.classList.contains('sign-in-htm')) {
-            lastWord = '�����������';
+            lastWord = 'авторизован';
         }
         else if(currentForm.classList.contains('sign-up-htm')){
-            lastWord = '���������������';
+            lastWord = 'заренистрирован';
         }
-        output.textContent = '������������ ' + response.name + ' ������� ' + lastWord;
+        output.textContent = 'Пользователь ' + response.name + ' успешно ' + lastWord;
     }
 }
 
@@ -33,6 +33,7 @@ for (let i = 0; i < forms.length; i ++){
 }
 function sendData(event){
     var currentPath;
+    let sendForm = {};
 
     event.preventDefault();
     if(event.target.type == 'submit'){
@@ -45,11 +46,65 @@ function sendData(event){
         }
         formToSend =  new FormData(currentForm);
         for (const [k, v] of formToSend) {
-            console.log(k + ': ' + v);
+            sendForm[k] = v;
         }
         xhr.open('POST', currentPath);
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(formToSend));
+        xhr.send(JSON.stringify(sendForm));
     }
 
 }
+//'use strict';
+//
+//const f1 = document.getElementsByClassName('sign-in-htm')[0];
+//const f2 = document.getElementsByClassName('sign-up-htm')[0];
+//const startUrl = 'https://neto-api.herokuapp.com/';
+//const endUrls = ['signin', 'signup'];
+//
+//document.addEventListener('DOMContentLoaded', onLoad);
+//
+//function onLoad() {
+//    [f1, f2].forEach((item, i) => {
+//        item.addEventListener('submit', function(e) {
+//            return onSubmit(e, item, i);
+//        });
+//    });
+//}
+//
+//function onSubmit(e, form, i) {
+//    e.preventDefault();
+//    const testF = {};
+//    const fData = new FormData(form);
+//    for (const [k, v] of fData) {
+//        testF[k] = v;
+//    }
+//    const xhr = new XMLHttpRequest();
+//    xhr.addEventListener('load', function (e) {
+//        return onXhrLoad(e, xhr, form, i)
+//    });
+//    xhr.addEventListener('error', onXhrError);
+//    xhr.open('POST', startUrl + endUrls[i]);
+//    xhr.setRequestHeader('Content-Type', 'application/json');
+//    xhr.send(JSON.stringify(testF));
+//}
+//
+//function onXhrLoad(e, op1, form, i) {
+//    const out = form.querySelector('output');
+//    try {
+//        const response = JSON.parse(op1.responseText);
+//        console.log(response);
+//        const {error, message} = response;
+//        const successPhrase = 'Пользователь Иван успешно авторизован';
+//        const repeatPhrase = 'Пользователь Иван успешно зарегистрирован';
+//        console.log(error, message);
+//        out.value = message ? message : i === 1 ? successPhrase : repeatPhrase;
+//    }
+//    catch(e) {
+//        const response = null;
+//    }
+//}
+//
+//function onXhrError(e) {
+//    console.log(e.data);
+//}
+//
