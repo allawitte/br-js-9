@@ -91,7 +91,9 @@ function handleColors(colors) {
         colorSwatch.appendChild(divWrap);
     })
 
-
+    if(!color){
+        colorSwatch.querySelector('input[type=radio]:not([disabled])').setAttribute('checked', true);
+    }
 }
 
 function handleSizes(sizes) {
@@ -133,6 +135,9 @@ function handleSizes(sizes) {
         divWrap.addEventListener('click', storeChoise);
         sizeSwatch.appendChild(divWrap);
     });
+    if(!size){
+        sizeSwatch.querySelector('input[type=radio]:not([disabled])').setAttribute('checked', true);
+    }
 
 }
 
